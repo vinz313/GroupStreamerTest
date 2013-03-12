@@ -19,7 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
@@ -30,7 +29,6 @@ import ch.epfl.unison.api.HttpClientFactory;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.ui.LoginActivity;
 
-import com.google.gson.JsonNull;
 import com.jayway.android.robotium.solo.Solo;
 
 public class LoginActivityTest extends
@@ -48,60 +46,38 @@ public class LoginActivityTest extends
 
 	public void testLoginSuccess() throws JSONException,
 			UnsupportedEncodingException {
-		String loginResponseContent = "{" +
-				"\"gid\": null," +
-				"\"nickname\": \"user0\"," +
-				"\"uid\": 0" +
-				"}";
-		
-		String putResponseContent = "{" +
-				"\"success\": true" +
-				"}";
-		
-		String groupsResponseContent = "{" +
-				"\"groups\": [" +
-				"{" +
-				"\"nb_users\": 0, " +
-				"\"gid\": 0, " +
-				"\"name\": \"test0\", " +
-				"\"distance\": null" +
-				"}, " +
-				"{" +
-				"\"nb_users\": 1, " +
-				"\"gid\": 1, " +
-				"\"name\": \"test1\", " +
-				"\"distance\": null" +
-				"}" +
-				"]" +
-				"}";
-		
-//		JSONObject loginResponseContent = new JSONObject().put("gid", JsonNull.INSTANCE)
-//				.put("nickname", "user0").put("uid", "0");
 
-//		JSONObject putResponseContent = new JSONObject().put("success", true);
+		JSONObject loginResponseContent = new JSONObject()
+				.put("gid", JSONObject.NULL).put("nickname", "user0")
+				.put("uid", "0");
 
-		
-//		JSONArray groupsResponseContent = new JSONArray().put(new JSONObject()
-//				.put("nb_users", 0).put("gid", 0).put("name", "test1")
-//				.put("distance", JsonNull.INSTANCE))
-//				.put(new JSONObject()
-//				.put("nb_users", 1).put("gid", 1).put("name", "test2")
-//				.put("distance", JsonNull.INSTANCE));
+		JSONObject putResponseContent = new JSONObject().put("success", true);
+
+		JSONObject groupsResponseContent = new JSONObject().put(
+				"groups",
+				new JSONArray().put(
+						new JSONObject().put("nb_users", 0).put("gid", 0)
+								.put("name", "test1")
+								.put("distance", JSONObject.NULL)).put(
+						new JSONObject().put("nb_users", 1).put("gid", 1)
+								.put("name", "test2")
+								.put("distance", JSONObject.NULL)));
 
 		HttpClient mockClient = mock(HttpClient.class);
 
 		HttpResponse loginSuccess = new BasicHttpResponse(new ProtocolVersion(
 				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
 		loginSuccess
-				.setEntity(new StringEntity(loginResponseContent));
+				.setEntity(new StringEntity(loginResponseContent.toString()));
 
 		HttpResponse putSuccess = new BasicHttpResponse(new ProtocolVersion(
 				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
-		putSuccess.setEntity(new StringEntity(putResponseContent));
-		
+		putSuccess.setEntity(new StringEntity(putResponseContent.toString()));
+
 		HttpResponse groupsSuccess = new BasicHttpResponse(new ProtocolVersion(
 				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
-		groupsSuccess.setEntity(new StringEntity(groupsResponseContent));
+		groupsSuccess.setEntity(new StringEntity(groupsResponseContent
+				.toString()));
 
 		try {
 			when(mockClient.execute((HttpUriRequest) anyObject())).thenReturn(
@@ -125,6 +101,12 @@ public class LoginActivityTest extends
 		solo.clickOnText("Log In");
 
 		solo.waitForText("Welcome");
+
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		solo.finishOpenedActivities();
 	}
