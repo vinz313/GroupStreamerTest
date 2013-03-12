@@ -15,9 +15,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpResponse;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -27,6 +25,7 @@ import android.widget.Button;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.HttpClientFactory;
 import ch.epfl.unison.api.UnisonAPI;
+import ch.epfl.unison.mockUtils.MockResponses;
 import ch.epfl.unison.ui.LoginActivity;
 
 import com.jayway.android.robotium.solo.Solo;
@@ -34,6 +33,8 @@ import com.jayway.android.robotium.solo.Solo;
 public class LoginActivityTest extends
 		ActivityInstrumentationTestCase2<LoginActivity> {
 
+	private MockResponses mockResponses;
+	
 	public LoginActivityTest() {
 		super(LoginActivity.class);
 	}
@@ -41,42 +42,28 @@ public class LoginActivityTest extends
 	@Override
 	public void setUp() throws Exception {
 		UnisonAPI.DEBUG = true;
+		mockResponses = new MockResponses();
 		super.setUp();
 	}
 
 	public void testLoginSuccess() throws JSONException,
 			UnsupportedEncodingException {
 
-		JSONObject loginResponseContent = new JSONObject()
-				.put("gid", JSONObject.NULL).put("nickname", "user0")
-				.put("uid", "0");
-
-		JSONObject putResponseContent = new JSONObject().put("success", true);
-
-		JSONObject groupsResponseContent = new JSONObject().put(
-				"groups",
-				new JSONArray().put(
-						new JSONObject().put("nb_users", 0).put("gid", 0)
-								.put("name", "test1")
-								.put("distance", JSONObject.NULL)).put(
-						new JSONObject().put("nb_users", 1).put("gid", 1)
-								.put("name", "test2")
-								.put("distance", JSONObject.NULL)));
-
+		//Creating the mock server:
 		HttpClient mockClient = mock(HttpClient.class);
 
 		HttpResponse loginSuccess = new BasicHttpResponse(new ProtocolVersion(
 				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
 		loginSuccess
-				.setEntity(new StringEntity(loginResponseContent.toString()));
+				.setEntity(new StringEntity(mockResponses.loginGETResponseContent.toString()));
 
 		HttpResponse putSuccess = new BasicHttpResponse(new ProtocolVersion(
 				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
-		putSuccess.setEntity(new StringEntity(putResponseContent.toString()));
+		putSuccess.setEntity(new StringEntity(mockResponses.libraryPUTResponseContent.toString()));
 
 		HttpResponse groupsSuccess = new BasicHttpResponse(new ProtocolVersion(
 				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
-		groupsSuccess.setEntity(new StringEntity(groupsResponseContent
+		groupsSuccess.setEntity(new StringEntity(mockResponses.groupsGETResponseContent
 				.toString()));
 
 		try {
@@ -89,7 +76,10 @@ public class LoginActivityTest extends
 		}
 
 		HttpClientFactory.setInstance(mockClient);
+		
+		//Mock done
 
+		//Launch test
 		Solo solo = new Solo(getInstrumentation(), getActivity());
 
 		Button loginBtn = (Button) solo.getView(R.id.loginBtn);
@@ -103,12 +93,12 @@ public class LoginActivityTest extends
 		solo.waitForText("Welcome");
 
 		try {
-			Thread.sleep(10000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
-		solo.finishOpenedActivities();
+//		solo.finishOpenedActivities();
 	}
 
 	@Override
