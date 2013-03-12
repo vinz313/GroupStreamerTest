@@ -31,7 +31,7 @@ import ch.epfl.unison.ui.LoginActivity;
 import com.jayway.android.robotium.solo.Solo;
 
 public class LoginActivityTest extends
-		ActivityInstrumentationTestCase2<LoginActivity> {
+ActivityInstrumentationTestCase2<LoginActivity> {
 
 	private MockResponses mockResponses;
 	
@@ -43,7 +43,6 @@ public class LoginActivityTest extends
 	public void setUp() throws Exception {
 		UnisonAPI.DEBUG = true;
 		mockResponses = new MockResponses();
-		super.setUp();
 	}
 
 	public void testLoginSuccess() throws JSONException,
@@ -90,19 +89,44 @@ public class LoginActivityTest extends
 		assertTrue(loginBtn.isEnabled());
 		solo.clickOnText("Log In");
 
-		solo.waitForText("Welcome");
+		assertTrue(solo.waitForText("Welcome"));
 
+		solo.finishOpenedActivities();
+	}
+	
+	public void testLoginFailure() {
+		HttpClient mockClient = mock(HttpClient.class);
+		
+		HttpResponse badReq = new BasicHttpResponse(new ProtocolVersion(
+				"HTTP", 1, 1), HttpStatus.SC_BAD_REQUEST, "Bad request, die!");
+		
 		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
+			when(mockClient.execute((HttpUriRequest) anyObject())).thenReturn(badReq);
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-//		solo.finishOpenedActivities();
+		HttpClientFactory.setInstance(mockClient);
+		
+		Solo solo = new Solo(getInstrumentation(), getActivity());
+
+		Button loginBtn = (Button) solo.getView(R.id.loginBtn);
+
+		solo.enterText(0, "theUser");
+		solo.enterText(1, "thePassWord");
+
+		assertTrue(loginBtn.isEnabled());
+		solo.clickOnText("Log In");
+		
+		assertTrue(solo.waitForText("Unable to log in. Are you connected ?"));
+		
+		solo.finishOpenedActivities();
 	}
 
 	@Override
-	protected void tearDown() {
+	public void tearDown() {
 		UnisonAPI.DEBUG = false;
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(getActivity());
