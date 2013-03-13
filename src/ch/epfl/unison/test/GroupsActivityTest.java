@@ -52,8 +52,6 @@ public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsA
         editor.putLong(PreferenceKeys.UID_KEY, uid != null ? uid : -1);
         editor.putBoolean(PreferenceKeys.HELPDIALOG_KEY, false);
         editor.commit();
-        
-		super.setUp();
 	}
 	
 	public void testGroupsToDisplay() throws UnsupportedEncodingException {
@@ -133,7 +131,7 @@ public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsA
 				solo.finishOpenedActivities();
 	}
 	
-	public void testGroupsFailBadRew() throws UnsupportedEncodingException {
+	public void testGroupsFailBadReq() throws UnsupportedEncodingException {
 		//Creating the mock server:
 				HttpClient mockClient = mock(HttpClient.class);
 

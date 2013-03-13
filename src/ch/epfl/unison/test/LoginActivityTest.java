@@ -24,8 +24,10 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.widget.Button;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.HttpClientFactory;
+import ch.epfl.unison.api.PreferenceKeys;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.mockUtils.MockResponses;
+import ch.epfl.unison.ui.GroupsActivity;
 import ch.epfl.unison.ui.LoginActivity;
 
 import com.jayway.android.robotium.solo.Solo;
@@ -43,6 +45,10 @@ ActivityInstrumentationTestCase2<LoginActivity> {
 	public void setUp() throws Exception {
 		UnisonAPI.DEBUG = true;
 		mockResponses = new MockResponses();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getInstrumentation().getTargetContext());
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(PreferenceKeys.HELPDIALOG_KEY, false);
+        editor.commit();
 	}
 
 	public void testLoginSuccess() throws JSONException,
@@ -56,18 +62,9 @@ ActivityInstrumentationTestCase2<LoginActivity> {
 		loginSuccess
 				.setEntity(new StringEntity(mockResponses.loginGETResponseContent.toString()));
 
-		HttpResponse putSuccess = new BasicHttpResponse(new ProtocolVersion(
-				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
-		putSuccess.setEntity(new StringEntity(mockResponses.libraryPUTResponseContent.toString()));
-
-		HttpResponse groupsSuccess = new BasicHttpResponse(new ProtocolVersion(
-				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
-		groupsSuccess.setEntity(new StringEntity(mockResponses.groupsGETResponseContent
-				.toString()));
-
 		try {
 			when(mockClient.execute((HttpUriRequest) anyObject())).thenReturn(
-					loginSuccess, putSuccess, groupsSuccess);
+					loginSuccess);
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -89,12 +86,12 @@ ActivityInstrumentationTestCase2<LoginActivity> {
 		assertTrue(loginBtn.isEnabled());
 		solo.clickOnText("Log In");
 
-		assertTrue(solo.waitForText("Welcome"));
+		assertTrue(solo.waitForActivity("GroupsActivity"));
 
 		solo.finishOpenedActivities();
 	}
 	
-	public void testLoginFailure() {
+	public void testLoginFailureBadReq() {
 		HttpClient mockClient = mock(HttpClient.class);
 		
 		HttpResponse badReq = new BasicHttpResponse(new ProtocolVersion(
@@ -124,12 +121,76 @@ ActivityInstrumentationTestCase2<LoginActivity> {
 		
 		solo.finishOpenedActivities();
 	}
+	
+	public void testLoginFailureEmptyEntity() {
+		HttpClient mockClient = mock(HttpClient.class);
+		
+		HttpResponse badReq = new BasicHttpResponse(new ProtocolVersion(
+				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
+		
+		try {
+			when(mockClient.execute((HttpUriRequest) anyObject())).thenReturn(badReq);
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		HttpClientFactory.setInstance(mockClient);
+		
+		Solo solo = new Solo(getInstrumentation(), getActivity());
+
+		Button loginBtn = (Button) solo.getView(R.id.loginBtn);
+
+		solo.enterText(0, "theUser");
+		solo.enterText(1, "thePassWord");
+
+		assertTrue(loginBtn.isEnabled());
+		solo.clickOnText("Log In");
+		
+		assertTrue(solo.waitForText("Unable to log in. Are you connected ?"));
+		
+		solo.finishOpenedActivities();
+	}
+	
+	public void testLoginFailureBadEntity() throws UnsupportedEncodingException {
+		HttpClient mockClient = mock(HttpClient.class);
+		
+		HttpResponse loginSuccess = new BasicHttpResponse(new ProtocolVersion(
+				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
+		loginSuccess
+				.setEntity(new StringEntity("malformed json"));
+		
+		try {
+			when(mockClient.execute((HttpUriRequest) anyObject())).thenReturn(loginSuccess);
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		HttpClientFactory.setInstance(mockClient);
+		
+		Solo solo = new Solo(getInstrumentation(), getActivity());
+
+		Button loginBtn = (Button) solo.getView(R.id.loginBtn);
+
+		solo.enterText(0, "theUser");
+		solo.enterText(1, "thePassWord");
+
+		assertTrue(loginBtn.isEnabled());
+		solo.clickOnText("Log In");
+		
+		assertTrue(solo.waitForText("Unable to log in. Are you connected ?"));
+		
+		solo.finishOpenedActivities();
+	}
 
 	@Override
 	public void tearDown() {
 		UnisonAPI.DEBUG = false;
 		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(getActivity());
+				.getDefaultSharedPreferences(getInstrumentation().getTargetContext());
 		Editor editor = prefs.edit();
 		editor.clear();
 		editor.commit();
