@@ -4,9 +4,19 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
+import android.test.ActivityInstrumentationTestCase2;
+import android.widget.Button;
+
+import ch.epfl.unison.Const;
+import ch.epfl.unison.R;
+import ch.epfl.unison.api.HttpClientFactory;
+import ch.epfl.unison.mockUtils.MockResponses;
+import ch.epfl.unison.ui.LoginActivity;
+
+import com.jayway.android.robotium.solo.Solo;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -20,24 +30,13 @@ import org.json.JSONException;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.preference.PreferenceManager;
-import android.test.ActivityInstrumentationTestCase2;
-import android.widget.Button;
-import ch.epfl.unison.Const;
-import ch.epfl.unison.R;
-import ch.epfl.unison.api.HttpClientFactory;
-import ch.epfl.unison.mockUtils.MockResponses;
-import ch.epfl.unison.ui.LoginActivity;
-
-import com.jayway.android.robotium.solo.Solo;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class LoginActivityTest extends
 ActivityInstrumentationTestCase2<LoginActivity> {
 
 	private MockResponses mockResponses;
-	private HashMap<String, HttpResponse> responseMap;
 	
 	
 	public LoginActivityTest() {
@@ -45,10 +44,9 @@ ActivityInstrumentationTestCase2<LoginActivity> {
 	}
 
 	@Override
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 //		UnisonAPI.DEBUG = true;
 		mockResponses = new MockResponses();
-		responseMap = mockResponses.responseMap;
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getInstrumentation().getTargetContext());
         SharedPreferences.Editor editor = prefs.edit();
@@ -78,22 +76,21 @@ ActivityInstrumentationTestCase2<LoginActivity> {
 							HttpUriRequest input = (HttpUriRequest) invocation.getArguments()[0];
 							
 							//This complex check is for the login comm, the path should always be "/" but I'm not sure and it might change
-							if (input.getURI().getPath() == null || input.getURI().getPath().isEmpty() || input.getURI().getPath().equals("/"))
-							{
-								return responseMap.get(mockResponses.LOGIN_KEY);
-							}
-							else if (input.getURI().getPath().contains("libentries"))
-							{
-								return responseMap.get(mockResponses.LIBENTRIES_KEY);
-							}
-							else if (input.getURI().getPath().contains("groups"))
-							{
-								return responseMap.get(mockResponses.GROUPS_SUCC_KEY);
-							}
-							else
-							{
-								return new BasicHttpResponse(new ProtocolVersion(
-										"HTTP", 1, 1), HttpStatus.SC_BAD_REQUEST, "Bad request, die! Asked : " + input.getURI().getPath()); // alternatively, you could throw an exception
+							if (input.getURI().getPath() == null
+									|| input.getURI().getPath().isEmpty()
+									|| input.getURI().getPath().equals("/")) {
+								return mockResponses.loginGETSuccess;
+							} else if (input.getURI().getPath()
+									.contains("libentries")) {
+								return mockResponses.responseForLibentriesPUT;
+							} else if (input.getURI().getPath()
+									.contains("groups")) {
+								return mockResponses.groupsGETSuccess;
+							} else {
+								return new BasicHttpResponse(
+										new ProtocolVersion(
+										"HTTP", 1, 1), HttpStatus.SC_BAD_REQUEST, "Bad request, die! Asked : " 
+												+ input.getURI().getPath()); // alternatively, you could throw an exception
 							}
 						}
 					}
@@ -121,13 +118,6 @@ ActivityInstrumentationTestCase2<LoginActivity> {
 
 		assertTrue(solo.waitForActivity("GroupsActivity"));
 
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		solo.finishOpenedActivities();
 		
 		
@@ -227,9 +217,19 @@ ActivityInstrumentationTestCase2<LoginActivity> {
 		
 		solo.finishOpenedActivities();
 	}
+	
+	public void testSignUpActivityStart() {
+	    Solo solo = new Solo(getInstrumentation(), getActivity());
+	    
+	    solo.clickOnText("Sign up");
+	    
+	    assertTrue(solo.waitForActivity("SignupActivity"));
+	    
+	    solo.finishOpenedActivities();
+	}
 
 	@Override
-	public void tearDown() {
+	protected void tearDown() {
 //		UnisonAPI.DEBUG = false;
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(getInstrumentation().getTargetContext());
