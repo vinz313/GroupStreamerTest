@@ -85,7 +85,7 @@ ActivityInstrumentationTestCase2<LoginActivity> {
 								return mockResponses.responseForLibentriesPUT;
 							} else if (input.getURI().getPath()
 									.contains("groups")) {
-								return mockResponses.groupsGETSuccess;
+								return mockResponses.groupsGETSuccessAfterCreation;
 							} else {
 								return new BasicHttpResponse(
 										new ProtocolVersion(

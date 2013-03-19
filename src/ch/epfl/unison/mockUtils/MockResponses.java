@@ -17,6 +17,8 @@ public class MockResponses {
 	public final HttpResponse responseForLibentriesPUT;
 
 	public final HttpResponse signupPOSTSuccess;
+	public final HttpResponse signupPOSTAlreadyExist;
+	public final HttpResponse signupPOSTInvalidEmail;
 
 	public final HttpResponse groupsGETSuccessAfterCreation;
 
@@ -68,5 +70,16 @@ public class MockResponses {
 		signupPOSTSuccess = new BasicHttpResponse(new ProtocolVersion(
                 "HTTP", 1, 1), HttpStatus.SC_OK, "OK");
 		signupPOSTSuccess.setEntity(new StringEntity(signupSuccessContent.toString()));
+		
+		
+		JSONObject signupAlreadyExistContent = new JSONObject().put("message", "user already exists").put("error", 2);
+		signupPOSTAlreadyExist = new BasicHttpResponse(new ProtocolVersion(
+                "HTTP", 1, 1), HttpStatus.SC_BAD_REQUEST, "BAD REQUEST");
+		signupPOSTAlreadyExist.setEntity(new StringEntity(signupAlreadyExistContent.toString()));
+		
+		JSONObject signupInvalidEmailContent = new JSONObject().put("message", "e-mail is not valid").put("error", 4);
+        signupPOSTInvalidEmail = new BasicHttpResponse(new ProtocolVersion(
+                "HTTP", 1, 1), HttpStatus.SC_BAD_REQUEST, "BAD REQUEST");
+        signupPOSTInvalidEmail.setEntity(new StringEntity(signupInvalidEmailContent.toString()));
 	}
 }

@@ -10,23 +10,19 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.jayway.android.robotium.solo.Solo;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.message.BasicHttpResponse;
-import org.json.JSONException;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
+import ch.epfl.unison.R;
 import ch.epfl.unison.api.HttpClientFactory;
 import ch.epfl.unison.mockUtils.MockResponses;
 import ch.epfl.unison.ui.SignupActivity;
+
+import com.jayway.android.robotium.solo.Solo;
+
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpUriRequest;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class SignupActivityTest extends
         ActivityInstrumentationTestCase2<SignupActivity> {
@@ -42,14 +38,11 @@ public class SignupActivityTest extends
         mockResponses = new MockResponses();
     }
 
-    public void testInvalidEmail() {
+    public void testInvalidEmail() throws UnsupportedEncodingException {
         HttpClient mockClient = mock(HttpClient.class);
 
-        HttpResponse badReq = new BasicHttpResponse(new ProtocolVersion(
-                "HTTP", 1, 1), HttpStatus.SC_BAD_REQUEST, "invalid email");
-
         try {
-            when(mockClient.execute((HttpUriRequest) anyObject())).thenReturn(badReq);
+            when(mockClient.execute((HttpUriRequest) anyObject())).thenReturn(mockResponses.signupPOSTInvalidEmail);
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -63,16 +56,12 @@ public class SignupActivityTest extends
         solo.enterText(0, "notAnEmail");
         solo.enterText(1, "thePassWord");
         solo.enterText(2, "thePassWord");
+        
+        solo.clickOnCheckBox(0);
 
-        solo.clickOnText("Sign Up");
+        solo.clickOnButton(1);
 
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
+        assertTrue(solo.waitForText(getInstrumentation().getTargetContext().getString(R.string.signup_form_email_invalid)));
         solo.finishOpenedActivities();
     }
 
@@ -87,22 +76,20 @@ public class SignupActivityTest extends
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        HttpClientFactory.setInstance(mockClient);
 
         Solo solo = new Solo(getInstrumentation(), getActivity());
 
         solo.enterText(0, "test@test.test");
         solo.enterText(1, "thePassWord");
         solo.enterText(2, "thePassWord");
+        
+        solo.clickOnCheckBox(0);
 
-        solo.clickOnText("Sign Up");
+        solo.clickOnButton(1);
 
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
+        assertTrue(solo.waitForActivity("GroupsActivity"));
         solo.finishOpenedActivities();
     }
 
