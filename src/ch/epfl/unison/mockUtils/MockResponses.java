@@ -1,7 +1,6 @@
 package ch.epfl.unison.mockUtils;
 
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -14,44 +13,36 @@ import org.json.JSONObject;
 
 public class MockResponses {
 
-	public final JSONObject loginGETResponseContent;
-	public final JSONObject libraryPUTResponseContent;
-	public final JSONObject groupsGETResponseContentTest1Test2NoDist;
-	public final HashMap<String, HttpResponse> responseMap;
-	public final String LIBENTRIES_KEY = "libentries";
-	public final String LOGIN_KEY = "loginKEY";
-	public final String GROUPS_SUCC_KEY = "groupsSucc";
-
+	public final HttpResponse loginGETSuccess;
+	public final HttpResponse responseForLibentriesPUT;
+	public final HttpResponse groupsGETSuccess;
 
 	public MockResponses() throws JSONException, UnsupportedEncodingException {
-		responseMap = new HashMap<String, HttpResponse>();
-		
+	
 		
 		// Phone sends email and password, server's answer is:
-		loginGETResponseContent = new JSONObject().put("gid", JSONObject.NULL)
+		JSONObject loginGETResponseContentSuccess = new JSONObject().put("gid", JSONObject.NULL)
 				.put("nickname", "user0").put("uid", "0");
 
-		HttpResponse loginSuccess = new BasicHttpResponse(new ProtocolVersion(
+		loginGETSuccess = new BasicHttpResponse(new ProtocolVersion(
 				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
-		loginSuccess
-				.setEntity(new StringEntity(loginGETResponseContent.toString()));
-		responseMap.put(LOGIN_KEY, loginSuccess);
+		loginGETSuccess
+				.setEntity(new StringEntity(loginGETResponseContentSuccess.toString()));
 		
 		
 		
 		// Phone sends its library, server's answer is:
-		libraryPUTResponseContent = new JSONObject().put("success", true);
+		JSONObject libraryPUTResponseContentSuccess = new JSONObject().put("success", true);
 
-		HttpResponse responseForLibentriesPUT = new BasicHttpResponse(new ProtocolVersion(
+		responseForLibentriesPUT = new BasicHttpResponse(new ProtocolVersion(
 				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
 		responseForLibentriesPUT
-		.setEntity(new StringEntity(libraryPUTResponseContent.toString()));
-		responseMap.put(LIBENTRIES_KEY, responseForLibentriesPUT);
+		.setEntity(new StringEntity(libraryPUTResponseContentSuccess.toString()));
 		
 		
 		
 		// Phone asks for groups, server's answer is:
-		groupsGETResponseContentTest1Test2NoDist = new JSONObject().put(
+		JSONObject groupsGETResponseContentTest1Test2NoDist = new JSONObject().put(
 				"groups",
 				new JSONArray().put(
 						new JSONObject().put("nb_users", 0).put("gid", 0)
@@ -61,10 +52,9 @@ public class MockResponses {
 								.put("name", "test2")
 								.put("distance", JSONObject.NULL)));
 		
-		HttpResponse groupsSuccess = new BasicHttpResponse(new ProtocolVersion(
+		groupsGETSuccess = new BasicHttpResponse(new ProtocolVersion(
 				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
-		groupsSuccess.setEntity(new StringEntity(groupsGETResponseContentTest1Test2NoDist
+		groupsGETSuccess.setEntity(new StringEntity(groupsGETResponseContentTest1Test2NoDist
 				.toString()));
-		responseMap.put(GROUPS_SUCC_KEY, groupsSuccess);
 	}
 }
