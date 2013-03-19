@@ -16,6 +16,7 @@ public class MockResponses {
 	public final HttpResponse loginGETSuccess;
 	public final HttpResponse responseForLibentriesPUT;
 	public final HttpResponse groupsGETSuccess;
+	public final HttpResponse signupPOSTSuccess;
 
 	public MockResponses() throws JSONException, UnsupportedEncodingException {
 	
@@ -56,5 +57,10 @@ public class MockResponses {
 				"HTTP", 1, 1), HttpStatus.SC_OK, "OK");
 		groupsGETSuccess.setEntity(new StringEntity(groupsGETResponseContentTest1Test2NoDist
 				.toString()));
+		
+		JSONObject signupSuccessContent = new JSONObject().put("uid", 0);
+		signupPOSTSuccess = new BasicHttpResponse(new ProtocolVersion(
+                "HTTP", 1, 1), HttpStatus.SC_OK, "OK");
+		groupsGETSuccess.setEntity(new StringEntity(signupSuccessContent.toString()));
 	}
 }
