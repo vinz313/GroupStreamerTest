@@ -181,7 +181,7 @@ public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsA
 						{
 							if(!newGroupCreated) {
 								Log.d("testlog", "va repondre sans newGroup");
-								return mockResponses.groupsGETSuccessAfterCreation;								
+								return mockResponses.groupsGETSuccess;								
 							}else {
 								Log.d("testlog", "va repondre avec newGroup");
 								return mockResponses.groupsGETSuccessAfterCreation;
