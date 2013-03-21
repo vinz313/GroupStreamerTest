@@ -22,6 +22,8 @@ public class MockResponses {
 
 	public final HttpResponse groupsGETSuccessAfterCreation;
 	public final HttpResponse groupsGETSuccess;
+	
+	public final HttpResponse mainGETGroupsSuccess;
 
 
 	public MockResponses() throws JSONException, UnsupportedEncodingException {
@@ -97,5 +99,17 @@ public class MockResponses {
         signupPOSTInvalidEmail = new BasicHttpResponse(new ProtocolVersion(
                 "HTTP", 1, 1), HttpStatus.SC_BAD_REQUEST, "BAD REQUEST");
         signupPOSTInvalidEmail.setEntity(new StringEntity(signupInvalidEmailContent.toString()));
+
+		JSONObject mainGETGroupsContent = new JSONObject()
+				.put("track", JSONObject.NULL)
+				.put("master", JSONObject.NULL)
+				.put("name", "cool group")
+				.put("users",
+						new JSONArray().put(new JSONObject()
+								.put("score", JSONObject.NULL)
+								.put("nickname", "nick").put("uid", 0)
+								.put("predicted", true)));
+        mainGETGroupsSuccess = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "OK");
+        mainGETGroupsSuccess.setEntity(new StringEntity(mainGETGroupsContent.toString()));
 	}
 }
