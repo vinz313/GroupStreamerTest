@@ -96,6 +96,49 @@ public class MainActivityTest extends
 
 		solo.finishOpenedActivities();
 	}
+	
+	public void testMenu() throws ClientProtocolException, IOException {
+	    HttpClient mockClient = mock(HttpClient.class);
+        
+	    when(mockClient.execute((HttpUriRequest) anyObject())).thenAnswer(
+                new Answer<HttpResponse>() {
+                    @Override
+                    public HttpResponse answer(final InvocationOnMock invocation)
+                            throws Throwable {
+                        HttpUriRequest input = (HttpUriRequest) invocation.getArguments()[0];
+                        
+                        if (input.getURI().getPath() == null || input.getURI().getPath().endsWith("groups")) {
+                            return mockResponses.groupsGETSuccess;
+                        } else if (input.getURI().getPath().endsWith("nickname")){
+                            return mockResponses.PUTNicknameSuccess;
+                        } else {
+                            return mockResponses.mainGETGroupsSuccess;
+                        }
+                    }
+                });
+        
+        HttpClientFactory.setInstance(mockClient);
+        
+        getActivity().startActivity(intent);
+        Solo solo = new Solo(getInstrumentation());
+        
+        solo.sendKey(Solo.MENU);
+        solo.clickOnText("Settings");
+        
+        assertTrue(solo.waitForText("UUID"));
+        
+        solo.clickOnText("Nickname");
+        
+        solo.enterText(0, "shiggy");
+        
+        solo.clickOnText("OK");
+        
+        solo.goBack();
+        
+        assertTrue(solo.waitForActivity("MainActivity"));
+        
+        solo.finishOpenedActivities();
+    }
 
 	@Override
 	protected void tearDown() {

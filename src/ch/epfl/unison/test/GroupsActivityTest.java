@@ -157,6 +157,33 @@ public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsA
 
 		solo.finishOpenedActivities();
 	}
+	
+	public void testMenu() throws ClientProtocolException, IOException {
+	    mockClient = mock(HttpClient.class);
+	    
+	    when(mockClient.execute((HttpUriRequest) anyObject())).thenReturn(mockResponses.groupsGETSuccess, mockResponses.PUTNicknameSuccess, mockResponses.groupsGETSuccess);
+	    
+	    HttpClientFactory.setInstance(mockClient);
+	    
+	    Solo solo = new Solo(getInstrumentation(), getActivity());
+	    
+	    solo.sendKey(Solo.MENU);
+	    solo.clickOnText("Settings");
+	    
+	    assertTrue(solo.waitForText("UUID"));
+	    
+	    solo.clickOnText("Nickname");
+	    
+	    solo.enterText(0, "shiggy");
+	    
+	    solo.clickOnText("OK");
+	    
+	    solo.goBack();
+	    
+	    assertTrue(solo.waitForActivity("GroupsActivity"));
+	    
+	    solo.finishOpenedActivities();
+	}
 
 	
 	public void testCreateGroupsAndDisplay() throws ClientProtocolException, IOException{

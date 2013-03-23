@@ -24,6 +24,8 @@ public class MockResponses {
 	public final HttpResponse groupsGETSuccess;
 	
 	public final HttpResponse mainGETGroupsSuccess;
+	
+	public final HttpResponse PUTNicknameSuccess;
 
 
 	public MockResponses() throws JSONException, UnsupportedEncodingException {
@@ -111,5 +113,10 @@ public class MockResponses {
 								.put("predicted", true)));
         mainGETGroupsSuccess = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "OK");
         mainGETGroupsSuccess.setEntity(new StringEntity(mainGETGroupsContent.toString()));
+        
+        
+        JSONObject PUTNicknameSuccessContent = new JSONObject().put("success", true);
+        PUTNicknameSuccess = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "OK");
+        PUTNicknameSuccess.setEntity(new StringEntity(PUTNicknameSuccessContent.toString()));
 	}
 }
