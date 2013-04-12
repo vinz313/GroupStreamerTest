@@ -31,6 +31,8 @@ import ch.epfl.unison.ui.GroupsActivity;
 import com.jayway.android.robotium.solo.Solo;
 
 public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsActivity> {
+    
+    private static final String TAG = "GroupsActivityTest";
 	
 	HttpClient mockClient;
 	
@@ -81,7 +83,47 @@ public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsA
 				
 				assertTrue(solo.waitForText("test1"));
 				
+				
+				
 				solo.finishOpenedActivities();
+	}
+	
+	public void testGroupsSuggestionSuccess() throws UnsupportedEncodingException {
+	    try {
+            when(mockClient.execute((HttpUriRequest) anyObject())).thenAnswer(
+                    new Answer<HttpResponse>() {
+
+                        @Override
+                        public HttpResponse answer(InvocationOnMock invocation) throws Throwable {
+                            HttpUriRequest input = (HttpUriRequest) invocation.getArguments()[0];
+
+                            if (input.getURI().getPath() == null
+                                    || input.getURI().getPath().isEmpty()
+                                    || input.getURI().getPath().equals("/"))
+                            {
+                                return mockResponses.loginGETSuccess;
+                            }
+                            if (input.getURI().getPath().contains("suggestion")) {
+                                Log.d("TAG", "answering to suggestion request.");
+                                return mockResponses.groupsGETSuggestion;
+                            } else {
+                                return mockResponses.groupsGETSuccess;
+                            }
+                        }
+                    });
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        HttpClientFactory.setInstance(mockClient);
+        
+        Solo solo = new Solo(getInstrumentation(), getActivity());
+        
+        assertTrue(solo.waitForText("user1"));
+        
+        solo.finishOpenedActivities();
 	}
 	
 	public void testGroupsFailEmptyEntity() throws UnsupportedEncodingException {

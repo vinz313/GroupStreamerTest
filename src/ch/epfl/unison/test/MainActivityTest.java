@@ -4,7 +4,20 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
+import android.test.ActivityInstrumentationTestCase2;
+
+import ch.epfl.unison.Const;
+import ch.epfl.unison.Const.PrefKeys;
+import ch.epfl.unison.api.HttpClientFactory;
+import ch.epfl.unison.mockUtils.MockResponses;
+import ch.epfl.unison.ui.MainActivity;
+import ch.epfl.unison.R;
+
+import com.jayway.android.robotium.solo.Solo;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -13,18 +26,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.preference.PreferenceManager;
-import android.test.ActivityInstrumentationTestCase2;
-import ch.epfl.unison.Const;
-import ch.epfl.unison.Const.PrefKeys;
-import ch.epfl.unison.api.HttpClientFactory;
-import ch.epfl.unison.mockUtils.MockResponses;
-import ch.epfl.unison.ui.MainActivity;
-
-import com.jayway.android.robotium.solo.Solo;
+import java.io.IOException;
 
 public class MainActivityTest extends
 		ActivityInstrumentationTestCase2<MainActivity> {
@@ -90,9 +92,9 @@ public class MainActivityTest extends
 
 		assertTrue(solo.waitForActivity("MainActivity"));
 
-		solo.clickOnText("STATS");
+		solo.clickOnText(solo.getString(R.string.fragment_title_stats));
 
-		solo.clickOnText("MUSIC");
+		solo.clickOnText(solo.getString(R.string.fragment_title_player));
 
 		solo.finishOpenedActivities();
 	}
@@ -121,6 +123,8 @@ public class MainActivityTest extends
         
         getActivity().startActivity(intent);
         Solo solo = new Solo(getInstrumentation());
+        
+        solo.waitForActivity("MainActivity");
         
         solo.sendKey(Solo.MENU);
         solo.clickOnText("Settings");

@@ -1,7 +1,5 @@
 package ch.epfl.unison.mockUtils;
 
-import java.io.UnsupportedEncodingException;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.ProtocolVersion;
@@ -10,6 +8,9 @@ import org.apache.http.message.BasicHttpResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 
 public class MockResponses {
 
@@ -22,6 +23,7 @@ public class MockResponses {
 
 	public final HttpResponse groupsGETSuccessAfterCreation;
 	public final HttpResponse groupsGETSuccess;
+	public final HttpResponse groupsGETSuggestion;
 	
 	public final HttpResponse mainGETGroupsSuccess;
 	
@@ -118,5 +120,16 @@ public class MockResponses {
         JSONObject PUTNicknameSuccessContent = new JSONObject().put("success", true);
         PUTNicknameSuccess = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "OK");
         PUTNicknameSuccess.setEntity(new StringEntity(PUTNicknameSuccessContent.toString()));
+        
+        String[] fakeUsers = {
+                "user1", "user2", "user3", "user4",
+                "user5", "user6", "user7", "user8", "user9", "user10", "user11", "user12"
+        };
+        JSONObject groupsGETSuggestionContent = new JSONObject()
+                .put("users", new JSONArray(Arrays.asList(fakeUsers)))
+                .put("group", new JSONObject().put("nb_users", 0)
+                                .put("gid", 0).put("name", "test1"));
+        groupsGETSuggestion = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "OK");
+        groupsGETSuggestion.setEntity(new StringEntity(groupsGETSuggestionContent.toString()));
 	}
 }
