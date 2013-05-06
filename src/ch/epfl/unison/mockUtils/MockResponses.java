@@ -44,6 +44,8 @@ public class MockResponses {
 	
 	
 	public final HttpResponse PUTCurrentSuccess;
+	
+	public final HttpResponse PUTPasswordSuccess;
 
 	public MockResponses() throws JSONException, UnsupportedEncodingException {
 
@@ -90,13 +92,17 @@ public class MockResponses {
 
 		JSONObject groupsGETResponseContent_Test1_Test2_NoDist = new JSONObject()
 				.put("groups",
-						new JSONArray().put(
-								new JSONObject().put("nb_users", 0)
-										.put("gid", 0).put("name", "test1")
-										.put("distance", JSONObject.NULL)).put(
-								new JSONObject().put("nb_users", 1)
-										.put("gid", 1).put("name", "test2")
-										.put("distance", JSONObject.NULL)));
+                        new JSONArray().put(
+                                new JSONObject().put("nb_users", 0)
+                                        .put("gid", 0).put("name", "test1")
+                                        .put("distance", JSONObject.NULL)).put(
+                                new JSONObject().put("nb_users", 1)
+                                        .put("gid", 1).put("name", "test2")
+                                        .put("distance", JSONObject.NULL)).put(
+                                new JSONObject().put("nb_users", 1)
+                                        .put("gid", 2).put("name", "test3")
+                                        .put("distance", JSONObject.NULL)
+                                        .put("password", true)));
 
 		groupsGETSuccess = new BasicHttpResponse(new ProtocolVersion("HTTP", 1,
 				1), HttpStatus.SC_OK, "OK");
@@ -146,9 +152,14 @@ public class MockResponses {
                 "user5", "user6", "user7", "user8", "user9", "user10", "user11", "user12"
         };
         JSONObject groupsGETSuggestionContent = new JSONObject()
-                .put("users", new JSONArray(Arrays.asList(fakeUsers)))
+                .put("suggestion", true)
+                .put("cluster", new JSONObject().put("cid", 0)
+                                   .put("lat", 0.0)
+                                   .put("lon", 0.0)
+                                   .put("gid", 0))
                 .put("group", new JSONObject().put("nb_users", 0)
-                                .put("gid", 0).put("name", "test1"));
+                                .put("gid", 0).put("name", "test1"))                 
+                .put("users", new JSONArray(Arrays.asList(fakeUsers)));
         groupsGETSuggestion = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, "OK");
         groupsGETSuggestion.setEntity(new StringEntity(groupsGETSuggestionContent.toString()));
 		mainGETGroupsNotDJSuccess = new BasicHttpResponse(new ProtocolVersion(
@@ -259,5 +270,12 @@ mainGETGroupsDJSuccess.setEntity(new StringEntity(mainGETGroupsDJContent
 				1, 1), HttpStatus.SC_OK, "OK");
 		PUTCurrentSuccess.setEntity(new StringEntity(PUTCurrentSuccessContent
 				.toString()));
+		
+		JSONObject PUTPasswordSuccessContent = new JSONObject().put("success",
+                true);
+        PUTPasswordSuccess = new BasicHttpResponse(new ProtocolVersion("HTTP",
+                1, 1), HttpStatus.SC_OK, "OK");
+        PUTPasswordSuccess.setEntity(new StringEntity(PUTPasswordSuccessContent
+                .toString()));
 	}
 }

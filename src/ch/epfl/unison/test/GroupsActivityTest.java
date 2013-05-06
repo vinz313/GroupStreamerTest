@@ -32,6 +32,7 @@ import com.jayway.android.robotium.solo.Solo;
 
 public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsActivity> {
     
+    @SuppressWarnings("unused")
     private static final String TAG = "GroupsActivityTest";
 	
 	HttpClient mockClient;
@@ -122,6 +123,13 @@ public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsA
         Solo solo = new Solo(getInstrumentation(), getActivity());
         
         assertTrue(solo.waitForText("user1"));
+        
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
         solo.finishOpenedActivities();
 	}
@@ -286,6 +294,51 @@ public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsA
 		
 		solo.finishOpenedActivities();
 		
+	}
+	
+	public void testJoinProtectedGroup() throws ClientProtocolException, IOException {
+	    mockClient = mock(HttpClient.class);
+        
+        when(mockClient.execute((HttpUriRequest) anyObject())).thenAnswer(new Answer<HttpResponse>() {
+
+            @Override
+            public HttpResponse answer(InvocationOnMock invocation) throws Throwable {
+                HttpUriRequest input = (HttpUriRequest) invocation.getArguments()[0];
+                String path = input.getURI().getPath();
+                
+                if (path.endsWith("groups")) {
+                    return mockResponses.groupsGETSuccess;
+                } else if (path.endsWith("2")) {
+                    Log.d(TAG, "received the following params: " + input.getParams().toString());
+                    return mockResponses.mainGETGroupsNotDJSuccess;
+                } else if (path.endsWith("group")) {
+                    return mockResponses.PUTPasswordSuccess;
+                }
+                return null;
+            }
+        });
+        HttpClientFactory.setInstance(mockClient);
+        
+        Solo solo = new Solo(getInstrumentation(), getActivity());
+        
+        solo.clickOnText("test3");
+        
+        assertTrue(solo.waitForText("Group Password"));
+        
+        solo.enterText(0, "0000");
+        
+        solo.clickOnText("OK");
+        
+        assertTrue(solo.waitForText("cool group"));
+        
+//        try {
+//            Thread.sleep(10000);
+//        } catch (InterruptedException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+        
+        solo.finishOpenedActivities();
 	}
 	
 	@Override

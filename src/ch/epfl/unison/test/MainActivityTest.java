@@ -43,8 +43,10 @@ public class MainActivityTest extends
 
 	private Intent intent;
 	
-	private boolean isDJ = false;
-	private int skippedSongsNumber = 0;
+	@SuppressWarnings("unused")
+    private boolean isDJ = false;
+	@SuppressWarnings("unused")
+    private int skippedSongsNumber = 0;
 
 	public MainActivityTest() {
 		super(MainActivity.class);
@@ -154,6 +156,49 @@ public class MainActivityTest extends
         
         solo.finishOpenedActivities();
     }
+	
+	public void testSetPassword() throws ClientProtocolException, IOException {
+	    HttpClient mockClient = mock(HttpClient.class);
+	    
+	    when(mockClient.execute((HttpUriRequest) anyObject())).thenAnswer(
+                new Answer<HttpResponse>() {
+                    @Override
+                    public HttpResponse answer(final InvocationOnMock invocation)
+                            throws Throwable {
+                        HttpUriRequest input = (HttpUriRequest) invocation.getArguments()[0];
+                        
+                        if (input.getURI().getPath() == null || input.getURI().getPath().endsWith("groups")) {
+                            return mockResponses.groupsGETSuccess;
+                        } else if (input.getURI().getPath().endsWith("master")){
+                            return mockResponses.PUTMasterSuccess;
+                        } else {
+                            return mockResponses.PUTPasswordSuccess;
+                        }
+                    }
+                });
+        
+        HttpClientFactory.setInstance(mockClient);
+        
+        getActivity().startActivity(intent);
+        Solo solo = new Solo(getInstrumentation());
+        
+        solo.waitForActivity("MainActivity");
+        
+        solo.clickOnText("Become the DJ");
+        
+        solo.sendKey(Solo.MENU);
+        solo.clickOnText("Set Password");
+        
+        assertTrue(solo.waitForText("Choose PIN"));
+        
+//        try {
+//            Thread.sleep(10000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        
+        solo.finishOpenedActivities();
+	}
 	
 	//We can make this test more precise by looking at the entity of the request with path "current"
 	//and see whether the song that is being played is indeed the one we expected.
