@@ -46,6 +46,9 @@ public class MockResponses {
 	public final HttpResponse PUTCurrentSuccess;
 	
 	public final HttpResponse PUTPasswordSuccess;
+	
+	public final HttpResponse historyGroupNotFound;
+	public final HttpResponse singleGroupAfterCreation;
 
 	public MockResponses() throws JSONException, UnsupportedEncodingException {
 
@@ -277,5 +280,23 @@ mainGETGroupsDJSuccess.setEntity(new StringEntity(mainGETGroupsDJContent
                 1, 1), HttpStatus.SC_OK, "OK");
         PUTPasswordSuccess.setEntity(new StringEntity(PUTPasswordSuccessContent
                 .toString()));
+        
+//        JSONObject historyGroupNotFoundContent = new JSONObject().put("error", 
+//                new JSONArray().put(new JSONObject().put("error", 6).put("message", "group not found")));
+//        historyGroupNotFound = new BasicHttpResponse(new ProtocolVersion("HTTP",
+//                1, 1), HttpStatus.SC_NOT_FOUND, "Not Found");
+        
+        JSONObject historyGroupNotFoundContent = new JSONObject().put("error", 6).put("message", "group not found");
+        historyGroupNotFound = new BasicHttpResponse(new ProtocolVersion("HTTP",
+                1, 1), HttpStatus.SC_NOT_FOUND, "Not Found");
+        historyGroupNotFound.setEntity(new StringEntity(historyGroupNotFoundContent.toString()));
+        
+        JSONObject singleGroupAfterCreationContent = new JSONObject().put("nb_users", 0)
+                .put("gid", 5).put("name", "newGroup")
+                .put("distance", JSONObject.NULL);
+        singleGroupAfterCreation = new BasicHttpResponse(new ProtocolVersion("HTTP",
+                1, 1), HttpStatus.SC_OK, "OK");
+        singleGroupAfterCreation.setEntity(new StringEntity(singleGroupAfterCreationContent.toString()));
+        
 	}
 }

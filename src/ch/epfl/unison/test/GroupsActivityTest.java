@@ -61,7 +61,7 @@ public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsA
         editor.putString(PrefKeys.EMAIL, email);
         editor.putString(PrefKeys.PASSWORD, password);
         editor.putString(PrefKeys.NICKNAME, nickname);
-        editor.putLong(PrefKeys.UID, uid != null ? uid : -1);
+        editor.putLong(PrefKeys.UID, uid);
         editor.putBoolean(PrefKeys.HELPDIALOG, false);
         editor.commit();
 	}
@@ -346,7 +346,6 @@ public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsA
 	
 	@Override
 	protected void tearDown() {
-//		UnisonAPI.DEBUG = false;
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(getActivity());
 		Editor editor = prefs.edit();
