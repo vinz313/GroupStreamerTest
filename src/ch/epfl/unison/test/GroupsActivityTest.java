@@ -32,7 +32,6 @@ import com.jayway.android.robotium.solo.Solo;
 
 public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsActivity> {
     
-    @SuppressWarnings("unused")
     private static final String TAG = "GroupsActivityTest";
 	
 	HttpClient mockClient;
@@ -99,7 +98,7 @@ public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsA
                             HttpUriRequest input = (HttpUriRequest) invocation.getArguments()[0];
 
                             if (input.getURI().getPath() == null
-                                    || input.getURI().getPath().isEmpty()
+                                    || (input.getURI().getPath().length() == 0)
                                     || input.getURI().getPath().equals("/"))
                             {
                                 return mockResponses.loginGETSuccess;
@@ -117,6 +116,10 @@ public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsA
         } catch (IOException e) {
             e.printStackTrace();
         }
+	    
+	    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getInstrumentation().getTargetContext());
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(PrefKeys.GROUP_SUGGESTION, true);
 
         HttpClientFactory.setInstance(mockClient);
         
@@ -331,12 +334,12 @@ public class GroupsActivityTest extends ActivityInstrumentationTestCase2<GroupsA
         
         assertTrue(solo.waitForText("cool group"));
         
-//        try {
-//            Thread.sleep(10000);
-//        } catch (InterruptedException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
         solo.finishOpenedActivities();
 	}
