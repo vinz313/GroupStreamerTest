@@ -16,7 +16,7 @@ import ch.epfl.unison.R;
 import ch.epfl.unison.api.HttpClientFactory;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.mockUtils.MockResponses;
-import ch.epfl.unison.ui.MainActivity;
+import ch.epfl.unison.ui.GroupsMainActivity;
 
 import com.jayway.android.robotium.solo.Solo;
 
@@ -29,8 +29,8 @@ import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
 
-public class MainActivityTest extends
-		ActivityInstrumentationTestCase2<MainActivity> {
+public class GroupsMainActivityTest extends
+		ActivityInstrumentationTestCase2<GroupsMainActivity> {
 
 	private MockResponses mockResponses;
 
@@ -48,8 +48,8 @@ public class MainActivityTest extends
 	@SuppressWarnings("unused")
     private int skippedSongsNumber = 0;
 
-	public MainActivityTest() {
-		super(MainActivity.class);
+	public GroupsMainActivityTest() {
+		super(GroupsMainActivity.class);
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class MainActivityTest extends
 		editor.commit();
 
 		intent = new Intent(getInstrumentation().getTargetContext(),
-				MainActivity.class).putExtra(Const.Strings.GID, gid).putExtra(
+				GroupsMainActivity.class).putExtra(Const.Strings.GID, gid).putExtra(
 				Const.Strings.NAME, gname).putExtra(Const.Strings.GROUP, group);
 	}
 
